@@ -18,6 +18,16 @@ jobs:
       - name: Checkout Code 
         uses: actions/checkout@v4
 
+      - name: Debug Build Context 
+        run: | 
+          echo "repository Structure"
+          ls -la 
+          echo "src/ directory: "
+          ls -la "src/
+          echo " "
+          echo " Dockerfile contents: "
+          cat src/Dockerfile
+
       # - name: Configure AWS Credentials 
       #   uses: aws-actions/configure-aws-credentials@v4
       #   with:
@@ -33,22 +43,36 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # - name: Build and push Docker image to Amazon ECR
+      #   working-directory: ./src
+      #   env: 
+      #     ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+      #   run: |
+      #     docker buildx create --use 
+      #     docker buildx build \ 
+      #     --file ./src/Dockerfile \
+      #     --platform linux/amd64 \ 
+      #     --tag "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" \
+      #     --push \
+      #     .
       - name: Build and push Docker image to Amazon ECR
-        working-directory: ./src
         env: 
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker buildx create --use 
-          docker buildx build \ 
-          --file ./src/Dockerfile \
-          --platform linux/amd64 \ 
-          --tag "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" \
-          --push \
+          docker build \
+          -f ./src/Dockerfile \
+          -t $ECR_REGISTRY/ECR_REPOSITORY:$IMAGE_TAG  \
+          -t $ECR_REGISTRY/ECR_REPOSITORY:latest \
           .
+          docker push $ECR_REGISTRY/ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/ECR_REPOSITORY:latest
 
-          # confirm the image was pushed successfully
-          echo "Image Build & pushed successfully: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
-        shell: bash
+          echo "Image Build & pushed successfully: $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+
+      #     # confirm the image was pushed successfully
+      #     echo "Image Build & pushed successfully: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+      #   shell: bash
 
 
       - name: Scan Image for Vulnerabilities 
