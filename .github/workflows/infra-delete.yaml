@@ -5,7 +5,7 @@ on:
     
 env:
   AWS_REGION: us-east-1
-  infra_dir: ~/student-portal/terraform 
+  infra_dir: . # Path to the directory containing Terraform configuration files
   terraform_version: 1.14.5
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
