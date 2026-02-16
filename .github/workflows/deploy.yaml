@@ -23,13 +23,18 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Download task defination for web 
-        if: ${{ github.ref == 'refs/heads/main'}}
+      - name: Download task definitaion 
         run: |
-          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION}} \
-          --query taskDefinition > task-definition.json 
-          ls -l task-definition.json 
+          aws ecs describe-task-definition \
+          --task-definition ${{ env.ECS_SERVICE }} \
+          --query taskDefinition > task-definition.json
+
+      # - name: Download task defination for web 
+      #   if: ${{ github.ref == 'refs/heads/main'}}
+      #   run: |
+      #     aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION}} \
+      #     --query taskDefinition > task-definition.json 
+      #     ls -l task-definition.json 
           
       - name: Fill in the new image ID for web the Amazon ECS task definition 
         if: ${{ github.ref == 'refs/heads/main' }}
