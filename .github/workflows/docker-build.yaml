@@ -39,10 +39,16 @@ jobs:
         run: |
           docker buildx create --use 
           docker buildx build \ 
+          --file ./src/Dockerfile \
           --platform linux/amd64 \ 
           --tag "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" \
           --push \
           .
+
+          # confirm the image was pushed successfully
+          echo "Image Build & pushed successfully: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+        shell: bash
+
 
       - name: Scan Image for Vulnerabilities 
         id: ecr-scan 
