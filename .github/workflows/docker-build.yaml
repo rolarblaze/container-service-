@@ -23,7 +23,7 @@ jobs:
           echo "repository Structure"
           ls -la 
           echo "src/ directory: "
-          ls -la "src/
+          ls -la src/
           echo " "
           echo " Dockerfile contents: "
           cat src/Dockerfile
