@@ -6,6 +6,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: app-repo
+  working-directory: ./src
   IMAGE_TAG: ${{ github.sha }} # Using the commit SHA as the image tag
 
 jobs:
@@ -43,7 +44,7 @@ jobs:
           --platform linux/amd64 \ 
           --tag "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}" \
           --push \
-          ./src
+          .
 
           # confirm the image was pushed successfully
           echo "Image Build & pushed successfully: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
