@@ -20,7 +20,7 @@ provider "aws" {
 
 terraform {
     backend "s3" {
-        bucket = "my-terraform-devroland-bucket"
+        bucket = "my-terraform-devroland-bucket01"
         key = "bootcamp/terraform/terraform.tfstate"
         region = "us-east-1"
         encrypt = true
