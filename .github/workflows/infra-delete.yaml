@@ -1,4 +1,4 @@
-name: Terraform CI Pipeline
+name: Terraform Delete Pipeline
 
 on: 
   workflow_dispatch:
