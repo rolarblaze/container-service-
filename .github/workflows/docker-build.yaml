@@ -36,21 +36,40 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Build and push Docker image to Amazon ECR
-        env: 
+        env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          ECR_REPOSITORY: app-repo
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build \
-          -f ./src/Dockerfile \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  \
-          -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-          .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "Building these tags:"
+          echo "  $ECR_REGISTRY/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          echo "  $ECR_REGISTRY/${ECR_REPOSITORY}:latest"
 
-          echo "Image Build & pushed successfully:" 
-          echo "  $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          echo "  $ECR_REGISTRY/$ECR_REPOSITORY:latest"
+          docker build \
+            -f ./src/Dockerfile \
+            -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" \
+            -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest" \
+            .
+
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+
+          echo "Push completed successfully"
+        # env: 
+        #   ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        #   IMAGE_TAG: ${{ github.sha }}
+        # run: |
+        #   docker build \
+        #   -f ./src/Dockerfile \
+        #   -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  \
+        #   -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+        #   .
+        #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+        #   echo "Image Build & pushed successfully:" 
+        #   echo "  $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        #   echo "  $ECR_REGISTRY/$ECR_REPOSITORY:latest"
 
       - name: Scan Image for Vulnerabilities 
         id: ecr-scan 
