@@ -87,7 +87,7 @@ jobs:
           find . -type f -name "*.tf" || echo "No .tf files found"
 
       - name: Terraform Init 
-        run: terrform init 
+        run: terraform init -input=false
         working-directory: ${{ env.TF_WORKING_DIR}}
 
       - name: Terraform Validate 
