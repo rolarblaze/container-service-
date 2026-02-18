@@ -103,4 +103,19 @@ jobs:
       - name: Show Destroy Plan 
         run: terraform show destroy.plan
           
-    
+      - name: Terraform Destroy  confirmation Check 
+        if: inputs.confirm_destroy != 'YES'
+        run: | 
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "   DESTROY CANCELLED"
+          echo "   You did NOT type YES → nothing deleted"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          exit 0
+
+      - name: Terraform Destroy execute 
+        if: inputs.confirm_destroy == 'YES' 
+        run: terraform apply -destroy -auto-approve destroy.plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
