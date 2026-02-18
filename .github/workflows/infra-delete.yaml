@@ -57,6 +57,10 @@ on:
       confirm-destroy:
         description: 'Type YES to confirm destroy (case-sensitive)'
         required: true
+        type: choice
+        options:
+          - 'NO - cancel (safe)'
+          - 'YES - Permanently destroy everything '
         default: 'NO'
 
 env:
@@ -113,7 +117,7 @@ jobs:
           exit 0
 
       - name: Terraform Destroy execute 
-        if: inputs.confirm_destroy == 'YES' 
+        if: inputs.confirm_destroy == 'YES - Permanently destroy everything '
         run: terraform apply -destroy -auto-approve destroy.plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
