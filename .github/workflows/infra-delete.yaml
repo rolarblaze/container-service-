@@ -152,6 +152,10 @@ jobs:
           echo ""
           echo "Terraform files:"
           find . -type f -name "*.tf" | head -20
+      - name: Set up terraform 
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }} 
 
       - name: Terraform Init
         run: terraform init 
