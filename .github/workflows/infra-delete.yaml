@@ -163,12 +163,13 @@ jobs:
           terraform state list || echo "No resources found in state"
 
       # Terraform Plan Destroy
-      - name: Terraform Plan Destroy 
-        run: |
-          echo "---------------------------------------------"
-          echo " RESOURCES TO BE DESTROYED "
-          echo "---------------------------------------------"
-          terraform show destroy.tfplan 
+      # - name: Terraform Plan Destroy 
+      #   run: |
+      #     echo "---------------------------------------------"
+      #     echo " RESOURCES TO BE DESTROYED "
+      #     echo "---------------------------------------------"
+      #     terraform show destroy.tfplan 
+
       - name: final Warning 
         run: | 
           echo "---------------------------------------------"

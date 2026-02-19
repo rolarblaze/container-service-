@@ -6,6 +6,7 @@ on:
 env:
   AWS_REGION: us-east-1
   TERRAFORM_VERSION: 1.9
+  INFRA_DIR: .
   
 
 jobs:
@@ -14,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest 
     defaults:
       run:
-        working-directory: .
+        working-directory:  ${{ env.INFRA_DIR }}
     steps: 
       - name: Checkout Repository 
         uses: actions/checkout@v3
@@ -48,5 +49,5 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
-          working-directory:  ${{ env.infra_dir }}
+          
           
