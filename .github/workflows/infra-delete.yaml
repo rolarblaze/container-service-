@@ -181,7 +181,7 @@ jobs:
           echo "---------------------------------------------"
           sleep 10  # 10 seconds for user to abort 
       - name: Execute Terraform destroy 
-        run: terraform apply -auto-approve destroy.tfplan
+        run: terraform destroy -auto-approve
 
       - name: Verify Destruction Complete 
         run: | 
