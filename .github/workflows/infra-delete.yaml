@@ -1,125 +1,206 @@
-# name: Terraform Delete Pipeline
+# name: Terraform Destroy Pipeline
 
 # on: 
 #   workflow_dispatch:
-    
+#     inputs:
+#       confirm-destroy:
+#         description: 'Type YES to confirm destroy (case-sensitive)'
+#         required: true
+#         type: choice
+#         options:
+#           - 'NO - cancel (safe)'
+#           - 'YES - Permanently destroy everything '
+#         default: 'NO'
+
 # env:
 #   AWS_REGION: us-east-1
-#   TERRAFORM_VERSION: 1.9
-  
+#   TF_VERSION: 1.9.x
+#   TF_WORKING_DIR: .
 
 # jobs:
-#   build-ecs-infrastructure:
-#     name: Build and Deploy ECS Infrastructure
-#     runs-on: ubuntu-latest 
-#     defaults:
-#       run:
-#         working-directory: .
-#     steps: 
-#       - name: Checkout Repository 
-#         uses: actions/checkout@v3
+#   terraform-destroy:
+#     name: Terraform Destroy Resources
+#     runs-on: ubuntu-latest
+#     if: github.event_name == 'workflow_dispatch'
 
-#       - name: Set up Terraform 
-#         uses: hashicorp/setup-terraform@v2
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v4
+      
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v3
 #         with:
-#           terraform_version: ${{ env.TERRAFORM_VERSION }}
+#           terraform_version: ${{ env.TF_VERSION }}
 
-#       - name: Initialize Terraform 
+#       - name: Debug - Show files $ location
 #         run: |
-#           terraform init 
-#       - name: Terraform Validate (quick sanity check)
-#         run: terraform validate
-        
-#       - name: Terraform Plan
-#         run: terraform plan -out=tfplan
+#           pwd 
+#           ls -la 
+#           echo "Looking for .tf files in current directory:"
+#           find . -type f -name "*.tf" || echo "No .tf files found"
+
+#       - name: Terraform Init 
+#         run: terraform init -input=false
+#         working-directory: ${{ env.TF_WORKING_DIR}}
+
+#       - name: Terraform Validate 
+#         run: terraform validate 
+
+#       - name: Terraform Destroy 
+#         run: terraform plan -destroy -out=destroy.plan -input=false 
 #         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 #           AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
 
-#       - name: Validate Terraform Configuration 
-#         if: github.event_name == 'workflow_dispatch'
-#         run: terraform destroy -auto-approve 
+#       - name: Show Destroy Plan 
+#         run: terraform show destroy.plan
+          
+#       - name: Terraform Destroy  confirmation Check 
+#         if: inputs.confirm_destroy != 'YES'
+#         run: | 
+#           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+#           echo "   DESTROY CANCELLED"
+#           echo "   You did NOT type YES → nothing deleted"
+#           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+#           exit 0
+
+#       - name: Terraform Destroy execute 
+#         if: inputs.confirm_destroy == 'YES - Permanently destroy everything '
+#         run: terraform apply -destroy -auto-approve destroy.plan
 #         env:
-#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
-#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+#           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 #           AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
-#           working-directory:  ${{ env.infra_dir }}
 
 
-### -----------------------------------------LATEST STEPS ------------------------------
-
-name: Terraform Destroy Pipeline
+# ----------------------------------------#######----------------------------------------------------------
+name: Terraform CI Pipeline
 
 on: 
   workflow_dispatch:
-    inputs:
-      confirm-destroy:
-        description: 'Type YES to confirm destroy (case-sensitive)'
-        required: true
-        type: choice
-        options:
+    inputs: 
+      confirm_destroy:
+        description: 'Type "DESTROY" to confirm permanent deletion '
+        required: true 
+        type: choice 
+        options: 
           - 'NO - cancel (safe)'
-          - 'YES - Permanently destroy everything '
-        default: 'NO'
-
-env:
-  AWS_REGION: us-east-1
-  TF_VERSION: 1.9.x
+          - 'DESTROY - Delete Everything '
+      environment:
+        description: 'Which environment to destroy?'
+        required: true 
+        type: choice 
+        options: 
+          - 'dev'
+          - 'staging'
+env: 
+  AWS_REGiON: us-east-1
+  TF_VERSION: 1.9
   TF_WORKING_DIR: .
 
-jobs:
+jobs: 
   terraform-destroy:
-    name: Terraform Destroy Resources
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    name: Destroy Infrastructure 
+    runs-on: ubuntu-latest 
+    if: github.event.inputs.confirm_destroy == 'DESTROY - Delete Everything'
+    defaults:
+      run: 
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
-    steps:
+    steps: 
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
 
-      - name: Debug - Show files $ location
+      - name: Configure AWS Credentials 
+        uses: aws-actions/configure-aws-credentials@v4
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Verify AWS Credentials 
+      - name: Verify AWS Credentials 
         run: |
+          echo "---------------------------------------------"
+          echo " AWS IDENTITY VERIFICATION "
+          echo "---------------------------------------------"
+          aws sts get-caller-identity 
+          echo ""
+          echo "Region: ${{ env.AWS_REGION }}"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+
+      - name: Set Terraform 
+        uses: hashicorp/setup-terraform@v3 
+        with: 
+          terraform_version: ${{ env.TF_VERSION }}
+      # debug Show directory structures 
+      - name: Debug - List Files 
+        run: |
+          echo "Current directory:"
           pwd 
-          ls -la 
-          echo "Looking for .tf files in current directory:"
-          find . -type f -name "*.tf" || echo "No .tf files found"
-
+          echo ""
+          echo "Files"
+          ls -al 
+          echo ""
+          echo "Terraform files:"
+          find . -type f -name "*.tf" | head -20 
+      # Terraform Init 
       - name: Terraform Init 
-        run: terraform init -input=false
-        working-directory: ${{ env.TF_WORKING_DIR}}
-
-      - name: Terraform Validate 
         run: terraform validate 
 
-      - name: Terraform Destroy 
-        run: terraform plan -destroy -out=destroy.plan -input=false 
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
-
-      - name: Show Destroy Plan 
-        run: terraform show destroy.plan
-          
-      - name: Terraform Destroy  confirmation Check 
-        if: inputs.confirm_destroy != 'YES'
+      # Show Current Resources 
+      - name: Show Current Resources 
         run: | 
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "   DESTROY CANCELLED"
-          echo "   You did NOT type YES → nothing deleted"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          exit 0
+          echo "---------------------------------------------"
+          echo " CURRENT RESOURCES "
+          echo "---------------------------------------------"
+          terraform state list || echo "No resources found in state"
 
-      - name: Terraform Destroy execute 
-        if: inputs.confirm_destroy == 'YES - Permanently destroy everything '
-        run: terraform apply -destroy -auto-approve destroy.plan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ env.AWS_REGION }}
+      # Terraform Plan Destroy
+      - name: Terraform Plan Destroy 
+        run: |
+          echo "---------------------------------------------"
+          echo " RESOURCES TO BE DESTROYED "
+          echo "---------------------------------------------"
+          terraform show destroy.tfplan 
+      - name: final Warning 
+        run: | 
+          echo "---------------------------------------------"
+          echo " FINAL WARNING "
+          echo "You are about to permanently DESTROY ALL RESOURCES in the ${{ github.event.inputs.environment }} environment!"
+          echo " Environment: ${{ github.event.inputs.environment}}"
+          echo "This action cannot be undone."
+          echo "If you are sure, please type DESTROY in the next step to proceed."
+          echo "---------------------------------------------"
+          sleep 10  # 10 seconds for user to abort 
+      - name: Execute Terraform destroy 
+        run: terraform apply -auto-approve destroy.tfplan
+
+      - name: Verify Destruction Complete 
+        run: | 
+          echo "---------------------------------------------"
+          echo " FINAL WARNING "
+          echo "---------------------------------------------"
+          echo ""
+          echo " Remaining resources:"
+          terraform state list || echo "All resources destroyed successfully!"
+          echo ""
+          echo "Destroyed by: ${{ github.actor }}"
+          echo "Timestamp: $(date -u)"
+
+      
+# ✅ Update summary 
+      - name: Create Summary 
+        if: always() 
+        run: |  
+          echo "## 💥 Infrastructure Destroyed" >> $GITHUB_STEP_SUMMARY  
+          echo "" >> $GITHUB_STEP_SUMMARY  
+          echo "**Environment:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY  
+          echo "**Destroyed by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY  
+          echo "**Timestamp:** $(date -u)" >> $GITHUB_STEP_SUMMARY  
+          echo "" >> $GITHUB_STEP_SUMMARY  
+          echo "### Resources Destroyed" >> $GITHUB_STEP_SUMMARY  
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY  terraform show destroy.tfplan | grep -A 1000 "Plan:" || echo "Plan details unavailable" >> $GITHUB_STEP_SUMMARY  
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          
