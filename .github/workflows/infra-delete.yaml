@@ -96,7 +96,7 @@ on:
       #     - 'dev'
       #     - 'staging'
 env: 
-  AWS_REGiON: us-east-1
+  AWS_REGION: us-east-1
   TF_VERSION: 1.9
   TF_WORKING_DIR: .
 
