@@ -86,7 +86,8 @@ on:
         type: choice 
         options: 
           - 'NO - cancel (safe)'
-          - 'DESTROY - Delete Everything '
+          - 'DESTROY - Delete Everything'
+        default: 'NO - cancel (safe)'
       # environment:
       #   description: 'Which environment to destroy?'
       #   required: true 
