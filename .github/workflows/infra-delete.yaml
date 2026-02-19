@@ -88,13 +88,13 @@
 #           - 'NO - cancel (safe)'
 #           - 'DESTROY - Delete Everything'
 #         default: 'NO - cancel (safe)'
-#       # environment:
-#       #   description: 'Which environment to destroy?'
-#       #   required: true 
-#       #   type: choice 
-#       #   options: 
-#       #     - 'dev'
-#       #     - 'staging'
+      # environment:
+      #   description: 'Which environment to destroy?'
+      #   required: true 
+      #   type: choice 
+      #   options: 
+      #     - 'dev'
+      #     - 'staging'
 # env: 
 #   AWS_REGION: us-east-1
 #   TF_VERSION: 1.9
