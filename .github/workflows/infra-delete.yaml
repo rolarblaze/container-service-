@@ -87,13 +87,13 @@ on:
         options: 
           - 'NO - cancel (safe)'
           - 'DESTROY - Delete Everything '
-      environment:
-        description: 'Which environment to destroy?'
-        required: true 
-        type: choice 
-        options: 
-          - 'dev'
-          - 'staging'
+      # environment:
+      #   description: 'Which environment to destroy?'
+      #   required: true 
+      #   type: choice 
+      #   options: 
+      #     - 'dev'
+      #     - 'staging'
 env: 
   AWS_REGiON: us-east-1
   TF_VERSION: 1.9
