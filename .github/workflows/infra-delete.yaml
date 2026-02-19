@@ -75,7 +75,7 @@
 
 
 # ----------------------------------------#######----------------------------------------------------------
-name: Terraform CI Pipeline
+name: Terraform Deletion CI Pipeline
 
 on: 
   workflow_dispatch:
