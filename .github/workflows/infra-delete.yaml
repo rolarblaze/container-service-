@@ -154,7 +154,7 @@ jobs:
           find . -type f -name "*.tf" | head -20
 
       - name: Terraform Init
-        run: terraform init -input=false
+        run: terraform init 
 
       - name: Terraform Validate
         run: terraform validate
