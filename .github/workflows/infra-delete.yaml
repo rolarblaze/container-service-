@@ -148,6 +148,10 @@ jobs:
           find . -type f -name "*.tf" | head -20 
       # Terraform Init 
       - name: Terraform Init 
+        run: terraform init -input=false 
+
+      # Terraform Validate 
+      - name: Terraform Validate
         run: terraform validate 
 
       # Show Current Resources 
