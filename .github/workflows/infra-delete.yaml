@@ -183,7 +183,7 @@ jobs:
       - name: Execute Terraform destroy
         run: |
           terraform destroy -auto-approve
-          working-directory: ${{ env.TF_WORKING_DIR }}
+#          #working-directory: ${{ env.TF_WORKING_DIR }}
 
 
       - name: Verify Destruction Complete
