@@ -78,10 +78,14 @@ jobs:
       - name: Scan Image for Vulnerabilities 
         id: ecr-scan 
         continue-on-error: true
+        env:
+          ECR_REPOSITORY: app-repo
+          AWS_REGION: ${{ env.AWS_REGION }}
         run: |
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
           aws ecr start-image-scan \
             --repository-name $ECR_REPOSITORY \
-            --image-id imageTag=${{steps.meta.outputs.sha_short }} \
+            --image-id imageTag=${SHORT_SHA} \
             --region $AWS_REGION
 
 
