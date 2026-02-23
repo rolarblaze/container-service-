@@ -59,22 +59,7 @@ jobs:
           docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
 
           echo "Push completed successfully"
-        # env: 
-        #   ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-        #   IMAGE_TAG: ${{ github.sha }}
-        # run: |
-        #   docker build \
-        #   -f ./src/Dockerfile \
-        #   -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  \
-        #   -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-        #   .
-        #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        #   docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-
-        #   echo "Image Build & pushed successfully:" 
-        #   echo "  $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        #   echo "  $ECR_REGISTRY/$ECR_REPOSITORY:latest"
-
+        
       - name: Scan Image for Vulnerabilities 
         id: ecr-scan 
         continue-on-error: true
