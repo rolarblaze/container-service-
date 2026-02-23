@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "app_repo" {
-  name = "app-repo"
+  name                 = "app-repo"
   image_tag_mutability = "MUTABLE"
 
   tags = {
@@ -8,6 +8,6 @@ resource "aws_ecr_repository" "app_repo" {
 }
 
 output "ecr_repository_url" {
-    value = aws_ecr_repository.app_repo.repository_url
-    description = "The URL of the ECR repository"
+  value       = aws_ecr_repository.app_repo.repository_url
+  description = "The URL of the ECR repository"
 }

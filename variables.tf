@@ -20,17 +20,17 @@ variable "tag" {
 }
 
 variable "container_port" {
-  type = number 
+  type    = number
   default = 8000
 }
 
 variable "health_check_path" {
-  type       = string
+  type        = string
   description = "The path for the health check of the target group"
   default     = "/health"
 }
 
 variable "image" {
-  type = string 
+  type    = string
   default = "879381241087.dkr.ecr.ap-south-1.amazonaws.com/student-portal"
 }

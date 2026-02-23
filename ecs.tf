@@ -25,7 +25,7 @@ resource "aws_ecs_task_definition" "test" {
       }
 
       "environment" = [
-        {"name" : "DB_LINK", "value" : "postgresql://${aws_db_instance.default.username}:${random_password.rds_password.result}@${aws_db_instance.default.address}:5432/${aws_db_instance.default.db_name}"}
+        { "name" : "DB_LINK", "value" : "postgresql://${aws_db_instance.default.username}:${random_password.rds_password.result}@${aws_db_instance.default.address}:5432/${aws_db_instance.default.db_name}" }
       ],
 
       "portMappings" = [
